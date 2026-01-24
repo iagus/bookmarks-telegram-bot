@@ -3,12 +3,16 @@ package main
 import (
 	"log"
 	"fmt"
+	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI("<token>")
+	token := os.Getenv("BOOKMARKS_TELEGRAM_BOT_TOKEN")
+	user := os.Getenv("BOOKMARKS_TELEGRAM_BOT_USER")
+
+	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -23,7 +27,7 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message != nil && update.Message.From.UserName == "<user>" {
+		if update.Message != nil && update.Message.From.UserName == user {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			answer := fmt.Sprintf("{ \"url\": \"%s\" }", update.Message.Text)
