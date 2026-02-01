@@ -34,7 +34,23 @@ func main() {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, answer)
 
 			bot.Send(msg)
+			writeToFile(msg.Text);
 		}
+	}
+}
+
+func writeToFile(msg string) {
+  path := "/var/lib/booksmarks-telegram-bot/urls.txt"
+
+  f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+  if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+  if _, err = f.WriteString(msg); err != nil {
+		panic(err)
 	}
 }
 
