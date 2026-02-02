@@ -55,11 +55,7 @@ func writeToFile(mark string) {
 
 	defer f.Close()
 
-	if !strings.HasSuffix(mark, "\n") {
-			mark += "\n"
-	}
-
-  if _, err = f.WriteString(mark); err != nil {
+  if _, err = f.WriteString(mark + "\n"); err != nil {
 		panic(err)
 	}
 
