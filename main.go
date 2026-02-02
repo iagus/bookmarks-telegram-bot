@@ -4,6 +4,7 @@ import (
 	"log"
 	"fmt"
 	"os"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -30,8 +31,10 @@ func main() {
 		if update.Message != nil && update.Message.From.UserName == user {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			mark := fmt.Sprintf("{ \"url\": \"%s\" }\n", update.Message.Text)
-			log.Printf("%q", mark)
+			mark := fmt.Sprintf("{ \"url\": \"%s\" }", update.Message.Text)
+
+			log.Printf("[go] %q", mark)
+
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, mark)
 
 			log.Print("[go] ACK back to chat")
@@ -51,6 +54,10 @@ func writeToFile(mark string) {
 	}
 
 	defer f.Close()
+
+	if !strings.HasSuffix(mark, "\n") {
+			mark += "\n"
+	}
 
   if _, err = f.WriteString(mark); err != nil {
 		panic(err)
