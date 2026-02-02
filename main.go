@@ -30,16 +30,17 @@ func main() {
 		if update.Message != nil && update.Message.From.UserName == user {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			answer := fmt.Sprintf("{ \"url\": \"%s\" }", update.Message.Text)
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, answer)
+			mark := fmt.Sprintf("{ \"url\": \"%s\" }", update.Message.Text)
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, mark)
 
 			bot.Send(msg)
-			writeToFile(msg.Text);
+
+			writeToFile(mark);
 		}
 	}
 }
 
-func writeToFile(msg string) {
+func writeToFile(mark string) {
   path := "/var/lib/bookmarks-telegram-bot/urls.txt"
 
   f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
@@ -49,7 +50,7 @@ func writeToFile(msg string) {
 
 	defer f.Close()
 
-  if _, err = f.WriteString(msg); err != nil {
+  if _, err = f.WriteString(mark); err != nil {
 		panic(err)
 	}
 }
