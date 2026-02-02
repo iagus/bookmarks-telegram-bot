@@ -40,7 +40,7 @@ func main() {
 }
 
 func writeToFile(msg string) {
-  path := "/var/lib/booksmarks-telegram-bot/urls.txt"
+  path := "/var/lib/bookmarks-telegram-bot/urls.txt"
 
   f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
   if err != nil {
