@@ -30,7 +30,7 @@ func main() {
 		if update.Message != nil && update.Message.From.UserName == user {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			mark := fmt.Sprintf("{ \"url\": \"%s\" }", update.Message.Text)
+			mark := fmt.Sprintf("{ \"url\": \"%s\" }\n", update.Message.Text)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, mark)
 
 			bot.Send(msg)
