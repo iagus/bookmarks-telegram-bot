@@ -33,7 +33,7 @@ func main() {
 			mark := fmt.Sprintf("{ \"url\": \"%s\" }\n", update.Message.Text)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, mark)
 
-			log.Printf("[go] ACK back to chat")
+			log.Print("[go] ACK back to chat")
 			bot.Send(msg)
 
 			writeToFile(mark);
