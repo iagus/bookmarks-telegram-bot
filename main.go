@@ -31,6 +31,7 @@ func main() {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			mark := fmt.Sprintf("{ \"url\": \"%s\" }\n", update.Message.Text)
+			log.Printf("%q", mark)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, mark)
 
 			log.Print("[go] ACK back to chat")
