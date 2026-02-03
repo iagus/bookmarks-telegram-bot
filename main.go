@@ -30,7 +30,7 @@ func main() {
 		if update.Message != nil && update.Message.From.UserName == user {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			mark := fmt.Sprintf("{ \"url\": \"%s\" }", update.Message.Text)
+			mark := fmt.Sprintf("Saving the following bookmark:\n %s", update.Message.Text)
 
 			log.Printf("[go] %q", mark)
 
