@@ -61,16 +61,18 @@ func processLink(link string) (Metadata) {
 	serviceURL := os.Getenv("BOOKMARKS_TELEGRAM_BOT_SERVICE_URL")
 	resp, err := http.Get(serviceURL + "?url=" + link)
 
+	var metadata Metadata
+
 	if err != nil {
 		log.Printf("[go] Error fetching metadata for provided link: %s", link)
-	}
+		metadata.Url = link
+	} else  {
+		defer resp.Body.Close()
 
-	defer resp.Body.Close()
-
-	var metadata Metadata
-	metadata.Url = link
-	if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
-		log.Printf("[go] Error decoding metadata for link: %s", link)
+		metadata.Url = link
+		if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
+			log.Printf("[go] Error decoding metadata for link: %s", link)
+		}
 	}
 
 	return metadata
