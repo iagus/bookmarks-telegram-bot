@@ -58,7 +58,7 @@ func main() {
 }
 
 func processLink(link string) (Metadata) {
-	serviceURL := os.Getenv("BOOKMARKS_TELEGRAM_BOT_SERVICE")
+	serviceURL := os.Getenv("BOOKMARKS_TELEGRAM_BOT_SERVICE_URL")
 	resp, err := http.Get(serviceURL + "?url=" + link)
 
 	if err != nil {
