@@ -16,7 +16,7 @@ type Metadata struct {
 		Title string `json:"title"`
 		Description string `json:"description"`
 		Image struct {
-			Url string `json:"url"`
+			URL string `json:"url"`
 		} `json:"image"`
 	} `json:"data"`
 }
