@@ -11,7 +11,7 @@ import (
 )
 
 type Metadata struct {
-	Url string
+	Link string
 	Data struct {
 		Title string `json:"title"`
 		Description string `json:"description"`
@@ -46,7 +46,7 @@ func main() {
 
 			log.Print("[go] ACK back to chat")
 
-			chat_res := fmt.Sprintf("[go] Saving the following bookmark:\n %s", update.Message.Text)
+			chat_res := fmt.Sprintf("Saving the following bookmark:\n %s", update.Message.Text)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, chat_res)
 			bot.Send(msg)
 
@@ -65,16 +65,15 @@ func processLink(link string) (Metadata) {
 
 	if err != nil {
 		log.Printf("[go] Error fetching metadata for provided link: %s", link)
-		metadata.Url = link
 	} else  {
 		defer resp.Body.Close()
 
-		metadata.Url = link
 		if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
 			log.Printf("[go] Error decoding metadata for link: %s", link)
 		}
 	}
 
+	metadata.Link = link
 	return metadata
 }
 
