@@ -6,9 +6,17 @@ import (
 	"os"
 	"net/http"
 	"encoding/json"
+	"gopkg.in/yaml.v3"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
+
+type Env struct {
+	Token string `yaml:"token"`
+	User string `yaml:"user"`
+	Path string `yaml:"path"`
+	Service string `yaml:"service"`
+}
 
 type Metadata struct {
 	Link string
@@ -21,9 +29,14 @@ type Metadata struct {
 	} `json:"data"`
 }
 
+var env = Env{}
+
 func main() {
-	token := os.Getenv("BOOKMARKS_TELEGRAM_BOT_TOKEN")
-	user := os.Getenv("BOOKMARKS_TELEGRAM_BOT_USER")
+	b, _ := os.ReadFile("telegram.env.yml")
+	yaml.Unmarshal(b, &env)
+
+	token := env.Token
+	user := env.User
 	var link string
 
 	bot, err := tgbotapi.NewBotAPI(token)
@@ -58,8 +71,7 @@ func main() {
 }
 
 func processLink(link string) (Metadata) {
-	serviceURL := os.Getenv("BOOKMARKS_TELEGRAM_BOT_SERVICE_URL")
-	resp, err := http.Get(serviceURL + "?url=" + link)
+	resp, err := http.Get(env.Service + "?url=" + link)
 
 	var metadata Metadata
 
@@ -78,8 +90,6 @@ func processLink(link string) (Metadata) {
 }
 
 func writeToFile(data Metadata) {
-  path := "/var/lib/bookmarks-telegram-bot/urls.txt"
-
 	processed_data, err := json.Marshal(data)
 	if (err != nil) {
 		log.Printf("[go] Error in json Marshal-ing")
@@ -87,7 +97,7 @@ func writeToFile(data Metadata) {
 
 	line := string(processed_data)
 
-  f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+  f, err := os.OpenFile(env.Path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
   if err != nil {
 		log.Printf("[go] Error opening file")
 	}
@@ -98,6 +108,6 @@ func writeToFile(data Metadata) {
 		log.Printf("[go] Error writing to file")
 	}
 
-	log.Printf("[go] Wrote %s to file %s", line, path)
+	log.Printf("[go] Wrote %s to file %s", line, env.Path)
 }
 
