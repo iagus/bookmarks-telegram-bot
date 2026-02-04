@@ -6,6 +6,7 @@ import (
 	"os"
 	"net/http"
 	"encoding/json"
+	"io"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -65,13 +66,22 @@ func processLink(link string) (Metadata) {
 
 	if err != nil {
 		log.Printf("[go] Error fetching metadata for provided link: %s", link)
-	} else  {
-		defer resp.Body.Close()
-
-		if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
-			log.Printf("[go] Error decoding metadata for link: %s", link)
-		}
 	}
+
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("[go] Error reading response body for link: %s", link)
+	}
+
+	log.Printf("[go] Raw response for %s:\n%s", link, string(body))
+
+	if err := json.Unmarshal(body, &metadata); err != nil {
+		log.Printf("[go] Error decoding metadata for link: %s: %v", link, err)
+	}
+
+	log.Printf("[go] Decoded metadata struct for %s:\n%+v", link, metadata)
 
 	metadata.Link = link
 	return metadata
