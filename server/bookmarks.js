@@ -15,11 +15,9 @@ const server = http.createServer((req, res) => {
     return res.end('Maybe try again later');
   }
 
-  if (stat.mtime == cache.mtime && stat.size == cache.size) {
-    // will serve html from file system
-  } else {
-    // render data into temporary html to prevent serving half writes
-    // we will switch it with the old version of the html once it's done
+  if (stat.mtime !== cache.mtime) {
+    // render data into temporary html to prevent serving partial rewrites
+    // we will replace the old version with it once it's done
     const tmpHtmlPath = htmlPath + '.tmp'
     const html = fs.createWriteStream(tmpHtmlPath);
     let output = '<!DOCTYPE html><body>';
