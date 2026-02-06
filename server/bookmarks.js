@@ -1,15 +1,44 @@
-const http = require('http');
-const path = require('path');
-const fs = require('fs');
-const readline = require('readline');
+import { createServer } from 'http';
+import { join, dirname } from 'path';
+import { createInterface } from 'readline';
+import { once } from 'events';
+import {
+  statSync,
+  createWriteStream,
+  createReadStream,
+  renameSync
+} from 'fs';
+
 const port = 3000;
-const htmlPath = path.join(__dirname, 'index.html');
+const htmlPath = join(dirname, 'index.html');
+const htmlPath = 'index.html';
 const dataFile = process.env.BOOKMARKS_TELEGRAM_BOT_PATH;
-const cache = { mtime: null }
+const cache = { mtimeMs: null }
 
-const server = http.createServer((req, res) => {
-  const stat = fs.statSync(dataFile, { throwIfNoEntry: false });
+async function writeLine(writer, line) {
+  if (!writer.write(line)) {
+    console.log('Buffer full. Draining');
+    console.log('buffer:', writer.writableLength, '/', writer.writableHighWaterMark);
+    await once(writer, 'drain');
+    console.log('Buffer drained');
+  }
+};
 
+function writeHeaders(res, data) {
+  res.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Content-Length': data.size,
+    'ETag': data.mtimeMs,
+    'LastModified': data.mtime.toUTCString()
+  });
+}
+
+function updateCache(stat) {
+  cache.mtimeMs = stat.mtimeMs;
+}
+
+const server = createServer(async (req, res) => {
+  const stat = statSync(dataFile, { throwIfNoEntry: false });
   if (!stat) {
     res.writeHead(503, { 'Content-Type': 'text/plain' });
     return res.end('Maybe try again later');
@@ -19,37 +48,50 @@ const server = http.createServer((req, res) => {
     // render data into temporary html to prevent serving partial rewrites
     // we will replace the old version with it once it's done
     const tmpHtmlPath = htmlPath + '.tmp'
-    const html = fs.createWriteStream(tmpHtmlPath);
-    const readStream = fs.createReadStream(dataFile, { encoding: 'utf8' });
-    const rl = readline.createInterface({
+    const html = createWriteStream(tmpHtmlPath);
+    const waterMark = html.writableHighWaterMark;
+    const readStream = createReadStream(dataFile, { encoding: 'utf8' });
+    const rl = createInterface({
       input: readStream,
       crlfDelay: Infinity
     });
 
-    html.write('<!DOCTYPE html><body>');
+    try {
+      await writeLine(html, '<!DOCTYPE html><body>');
 
-    rl.on('line', (line) => {
-      bm = JSON.parse(line)
-      html.write(`<div><a href="${bm.Link}">${bm?.data?.title}</a></div>`);
-    });
+      for await (const line of rl) {
+        const bm = JSON.parse(line)
+        const rendered = `<div><a href="${bm.Link}">${bm?.data?.title}</a></div>`;
 
-    rl.on('close', function () {
-      html.write('</body></html>');
-      html.end(() => fs.renameSync(tmpHtmlPath, htmlPath));
-    });
+        await writeLine(html, rendered);
+      }
 
-    // updates cache
-    cache.mtime = stat.mtime;
+      await writeLine(html, '</body></html>');
+
+      html.end();
+      await once(html, 'finish');
+
+      renameSync(tmpHtmlPath, htmlPath);
+
+      updateCache(stat);
+
+      const contentData = statSync(htmlPath);
+      writeHeaders(res, contentData);
+
+      // pipe to response
+      createReadStream(htmlPath).pipe(res);
+
+    } catch (err) {
+      html.destroy();
+      throw err;
+    }
+  } else {
+
+    writeHeaders(res, cache);
+
+    // pipe to response
+    createReadStream(htmlPath).pipe(res);
   }
-
-  res.writeHead(200,{
-    'Content-Type': 'text/html',
-    'Content-Length': stat.size,
-    'ETag': stat.mtime,
-    'LastModified': stat.mtime.toUTCString()
-  });
-
-  fs.createReadStream(htmlPath).pipe(res);
 });
 
 server.listen(port, () => {
