@@ -20,30 +20,27 @@ const server = http.createServer((req, res) => {
     // we will replace the old version with it once it's done
     const tmpHtmlPath = htmlPath + '.tmp'
     const html = fs.createWriteStream(tmpHtmlPath);
-    let output = '<!DOCTYPE html><body>';
-    let bookmarks = '';
     const readStream = fs.createReadStream(dataFile, { encoding: 'utf8' });
     const rl = readline.createInterface({
       input: readStream,
       crlfDelay: Infinity
     });
 
+    html.write('<!DOCTYPE html><body>');
+
     rl.on('line', (line) => {
-      bookmark = JSON.parse(line)
-      output += '<div>\
-        <a href=\"' + bookmark.Link + '\">' +
-        bookmark?.data?.title + '</a></div>';
+      bm = JSON.parse(line)
+      html.write(`<div><a href="${bm.Link}">${bm?.data?.title}</a></div>`);
     });
 
     rl.on('close', function () {
-      output += '</body></html>';
-      html.write(output);
+      html.write('</body></html>');
       html.end(() => fs.renameSync(tmpHtmlPath, htmlPath));
     });
-  }
 
-  // updates cache
-  cache.mtime = stat.mtime;
+    // updates cache
+    cache.mtime = stat.mtime;
+  }
 
   res.writeHead(200,{
     'Content-Type': 'text/html',
