@@ -51,7 +51,8 @@ const server = http.createServer((req, res) => {
     'ETag': stat.mtime,
     'LastModified': stat.mtime.toUTCString()
   });
-  res.createReadStream(htmlPath).pipe(res);
+
+  fs.createReadStream(htmlPath).pipe(res);
 });
 
 server.listen(port, () => {
