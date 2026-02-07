@@ -16,10 +16,11 @@ const cache = { mtimeMs: null }
 
 async function writeLine(writer, line) {
   if (!writer.write(line)) {
-    console.log('Buffer full. Draining');
+    const stamp = `[bookmarks node][${new Date(Date.now()).toUTCString()}]`;
+    console.log(`${stamp} Buffer full. Draining`);
     console.log('buffer:', writer.writableLength, '/', writer.writableHighWaterMark);
     await once(writer, 'drain');
-    console.log('Buffer drained');
+    console.log(`${stamp} Buffer drained`);
   }
 };
 
