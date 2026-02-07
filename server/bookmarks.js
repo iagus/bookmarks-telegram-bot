@@ -49,7 +49,6 @@ const server = createServer(async (req, res) => {
     // we will replace the old version with it once it's done
     const tmpHtmlPath = htmlPath + '.tmp'
     const html = createWriteStream(tmpHtmlPath);
-    const waterMark = html.writableHighWaterMark;
     const readStream = createReadStream(dataFile, { encoding: 'utf8' });
     const rl = createInterface({
       input: readStream,
