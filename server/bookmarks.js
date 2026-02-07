@@ -55,7 +55,7 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  if (stat.mtime !== cache.mtime) {
+  if (stat.mtimeMs !== cache.mtimeMs) {
     // render data into temporary html to prevent serving partial rewrites
     // we will replace the old version with it once it's done
     const tmpHtmlPath = htmlPath + '.tmp'
@@ -97,7 +97,7 @@ const server = createServer(async (req, res) => {
     }
   } else {
 
-    writeHeaders(res, cache);
+    writeHeaders(res, stat);
 
     // pipe to response
     createReadStream(htmlPath).pipe(res);
