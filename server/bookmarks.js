@@ -11,7 +11,7 @@ import {
 
 const port = 3000; // To do: change server port. like 3001 or smth
 const htmlPath = 'index.html';
-const dataFile = process.env.BOOKMARKS_TELEGRAM_BOT_PATH;
+const dataFile = process.env.BOOKMARKS_PATH;
 const cache = { mtimeMs: null }
 
 async function writeLine(writer, line) {
