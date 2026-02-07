@@ -37,12 +37,13 @@ function writeHeaders(res, data) {
 function updateCache(stat) {
   cache.mtimeMs = stat.mtimeMs;
   cache.size = stat.size;
+  cache.etag = `"${stat.mtimeMs}"`
 }
 
 const server = createServer(async (req, res) => {
-  if (req.headers['if-none-match'] === cache.mtimeMs) {
+  if (req.headers['if-none-match'] === cache.etag) {
     res.writeHead(304, {
-      'ETag': `"${cache.mtimeMs}"`,
+      'ETag': cache.etag,
       'Cache-Control': 'public, max-age=3600'
     });
     res.end();
