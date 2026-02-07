@@ -9,7 +9,7 @@ import {
   renameSync
 } from 'fs';
 
-const port = 3000; // To do: change server port. like 3001 or smth
+const port = 3001;
 const htmlPath = 'index.html';
 const dataFile = process.env.BOOKMARKS_PATH;
 const cache = { mtimeMs: null }
