@@ -30,10 +30,14 @@ function updateCache(stat) {
   cache.etag = `"${stat.mtimeMs}"`
 }
 
+function normalizeETag(etag) {
+  if (!etag) return "";
+
+  return etag.startsWith("W/") ? etag.replace(/^W\//, '') : etag;
+}
+
 const server = createServer(async (req, res) => {
-  console.log('if none match', req.headers['if-none-match']);
-  console.log('cache etag', cache.etag);
-  if (req.headers['if-none-match'] === cache.etag) {
+  if (normalizeETag(req.headers['if-none-match']) === cache.etag) {
     res.writeHead(304, {
       'ETag': cache.etag,
       'Cache-Control': 'public, max-age=3600'
