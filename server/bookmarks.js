@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import { createInterface } from 'readline';
 import { once } from 'events';
 import {
@@ -9,8 +9,7 @@ import {
   renameSync
 } from 'fs';
 
-const port = 3000;
-const htmlPath = join(dirname, 'index.html');
+const port = 3000; // To do: change server port. like 3001 or smth
 const htmlPath = 'index.html';
 const dataFile = process.env.BOOKMARKS_TELEGRAM_BOT_PATH;
 const cache = { mtimeMs: null }
