@@ -12,7 +12,7 @@ import {
 const port = 3001;
 const htmlPath = 'index.html';
 const dataFile = process.env.BOOKMARKS_PATH;
-const cache = { mtimeMs: null }
+const cache = { mtimeMs: null, size: 0 }
 
 async function writeLine(writer, line) {
   if (!writer.write(line)) {
@@ -28,20 +28,21 @@ function writeHeaders(res, data) {
   res.writeHead(200, {
     'Content-Type': 'text/html',
     'Content-Length': data.size,
-    'ETag': data.mtimeMs,
-    'Last-Modified': data.mtime.toUTCString(),
+    'ETag': `"${cache.mtimeMs}"`,
+    'Last-Modified': data.mtimeMs.toUTCString(),
     'Cache-Control': 'public, max-age=3600'
   });
 }
 
 function updateCache(stat) {
   cache.mtimeMs = stat.mtimeMs;
+  cache.size = stat.size;
 }
 
 const server = createServer(async (req, res) => {
   if (req.headers['if-none-match'] === cache.mtimeMs) {
     res.writeHead(304, {
-      'ETag': cache.mtimeMs,
+      'ETag': `"${cache.mtimeMs}"`,
       'Cache-Control': 'public, max-age=3600'
     });
     res.end();
@@ -83,10 +84,15 @@ const server = createServer(async (req, res) => {
 
       renameSync(tmpHtmlPath, htmlPath);
 
-      updateCache(stat);
-
-      const contentData = statSync(htmlPath);
-      writeHeaders(res, contentData);
+      const newStat = statSync(htmlPath);
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Length': newStat.size,
+        'ETag': `"${newStat.mtimeMs}"`,
+        'Last-Modified': newStat.mtime.toUTCString(),
+        'Cache-Control': 'public, max-age=3600'
+      });
+      updateCache(newStat);
 
       // pipe to response
       createReadStream(htmlPath).pipe(res);
@@ -97,7 +103,13 @@ const server = createServer(async (req, res) => {
     }
   } else {
 
-    writeHeaders(res, stat);
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Length': cache.size,
+      'ETag': `"${cache.mtimeMs}"`,
+      'Last-Modified': cache.mtime.toUTCString(),
+      'Cache-Control': 'public, max-age=3600'
+    });
 
     // pipe to response
     createReadStream(htmlPath).pipe(res);
