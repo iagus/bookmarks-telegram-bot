@@ -29,7 +29,8 @@ function writeHeaders(res, data) {
     'Content-Type': 'text/html',
     'Content-Length': data.size,
     'ETag': data.mtimeMs,
-    'LastModified': data.mtime.toUTCString()
+    'Last-Modified': data.mtime.toUTCString(),
+    'Cache-Control': 'public, max-age=3600'
   });
 }
 
@@ -38,10 +39,20 @@ function updateCache(stat) {
 }
 
 const server = createServer(async (req, res) => {
+  if (req.headers['if-none-match'] === cache.mtimeMs) {
+    res.writeHead(304, {
+      'ETag': cache.mtimeMs,
+      'Cache-Control': 'public, max-age=3600'
+    });
+    res.end();
+    return;
+  }
+
   const stat = statSync(dataFile, { throwIfNoEntry: false });
   if (!stat) {
     res.writeHead(503, { 'Content-Type': 'text/plain' });
-    return res.end('Maybe try again later');
+    res.end('Maybe try again later');
+    return;
   }
 
   if (stat.mtime !== cache.mtime) {
