@@ -24,16 +24,6 @@ async function writeLine(writer, line) {
   }
 };
 
-function writeHeaders(res, data) {
-  res.writeHead(200, {
-    'Content-Type': 'text/html',
-    'Content-Length': data.size,
-    'ETag': `"${cache.mtimeMs}"`,
-    'Last-Modified': data.mtimeMs.toUTCString(),
-    'Cache-Control': 'public, max-age=3600'
-  });
-}
-
 function updateCache(stat) {
   cache.mtimeMs = stat.mtimeMs;
   cache.size = stat.size;
@@ -41,6 +31,8 @@ function updateCache(stat) {
 }
 
 const server = createServer(async (req, res) => {
+  console.log('if none match', req.headers['if-none-match']);
+  console.log('cache etag', cache.etag);
   if (req.headers['if-none-match'] === cache.etag) {
     res.writeHead(304, {
       'ETag': cache.etag,
@@ -107,7 +99,7 @@ const server = createServer(async (req, res) => {
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8',
       'Content-Length': cache.size,
-      'ETag': `"${cache.mtimeMs}"`,
+      'ETag': cache.etag,
       'Last-Modified': cache.mtime.toUTCString(),
       'Cache-Control': 'public, max-age=3600'
     });
