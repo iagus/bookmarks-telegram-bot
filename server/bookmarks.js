@@ -6,7 +6,8 @@ import {
   statSync,
   createWriteStream,
   createReadStream,
-  renameSync
+  renameSync,
+  unlink
 } from 'fs';
 
 const port = 3001;
@@ -113,7 +114,7 @@ const server = createServer(async (req, res) => {
       rl.close();
       readStream.destroy();
       html.destroy();
-      fs.unlink(tmpHtmlPath);
+      unlink(tmpHtmlPath, () => {});
 
       throw err;
     }
