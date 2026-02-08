@@ -97,7 +97,7 @@ const server = createServer(async (req, res) => {
         'Content-Type': 'text/html; charset=utf-8',
         'Content-Length': htmlStat.size,
         'ETag': `"${stat.mtimeMs}"`, // keeping reference to data file
-        'Last-Modified': htmlStat.mtimeMs.toUTCString(),
+        'Last-Modified': htmlStat.mtime.toUTCString(),
         'Cache-Control': 'public, max-age=3600'
       });
 
@@ -124,7 +124,7 @@ const server = createServer(async (req, res) => {
       'Content-Type': 'text/html; charset=utf-8',
       'Content-Length': cache.size,
       'ETag': cache.etag,
-      'Last-Modified': cache.mtimeMs.toUTCString(),
+      'Last-Modified': cache.mtime.toUTCString(),
       'Cache-Control': 'public, max-age=3600'
     });
 
