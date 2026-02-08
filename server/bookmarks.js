@@ -12,7 +12,7 @@ import {
 const port = 3001;
 const htmlPath = 'index.html';
 const dataFile = process.env.BOOKMARKS_PATH;
-const cache = { mtimeMs: null, size: 0 }
+const cache = { mtimeMs: null, size: 0, etag: '' }
 
 async function writeLine(writer, line) {
   if (!writer.write(line)) {
@@ -30,6 +30,7 @@ function updateCache(stat) {
   cache.etag = `"${stat.mtimeMs}"`
 }
 
+// To compare ETags, discard weak ETag flag, compare in strong format.
 function normalizeETag(etag) {
   if (!etag) return "";
 
@@ -37,6 +38,13 @@ function normalizeETag(etag) {
 }
 
 const server = createServer(async (req, res) => {
+  const stat = statSync(dataFile, { throwIfNoEntry: false });
+  if (!stat) {
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Maybe try again later');
+    return;
+  }
+
   if (normalizeETag(req.headers['if-none-match']) === cache.etag) {
     res.writeHead(304, {
       'ETag': cache.etag,
@@ -46,13 +54,10 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  const stat = statSync(dataFile, { throwIfNoEntry: false });
-  if (!stat) {
-    res.writeHead(503, { 'Content-Type': 'text/plain' });
-    res.end('Maybe try again later');
-    return;
-  }
-
+  // We are using the data file's mtimeMs as a sort of identifier.
+  // So it will also function as an ETag header. Here we are comparing
+  // the current file state's mtimeMs with the cached mtimeMs from 
+  // the previous html build's data file mtimeMs.
   if (stat.mtimeMs !== cache.mtimeMs) {
     // render data into temporary html to prevent serving partial rewrites
     // we will replace the old version with it once it's done
@@ -81,17 +86,22 @@ const server = createServer(async (req, res) => {
 
       renameSync(tmpHtmlPath, htmlPath);
 
-      const newStat = statSync(htmlPath);
+      const htmlStat = statSync(htmlPath);
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
-        'Content-Length': newStat.size,
-        'ETag': `"${newStat.mtimeMs}"`,
-        'Last-Modified': newStat.mtime.toUTCString(),
+        'Content-Length': htmlStat.size,
+        'ETag': `"${stat.mtimeMs}"`, // keeping reference to data file
+        'Last-Modified': htmlStat.mtime.toUTCString(),
         'Cache-Control': 'public, max-age=3600'
       });
-      updateCache(newStat);
 
-      // pipe to response
+      // Save current build information for later checks.
+      updateCache({
+        mtimeMs: stat.mtimeMs,
+        size: htmlStat.size,
+        etag: `"${stat.mtimeMs}"`
+      });
+
       createReadStream(htmlPath).pipe(res);
 
     } catch (err) {
@@ -108,7 +118,6 @@ const server = createServer(async (req, res) => {
       'Cache-Control': 'public, max-age=3600'
     });
 
-    // pipe to response
     createReadStream(htmlPath).pipe(res);
   }
 });
