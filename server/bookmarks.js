@@ -38,19 +38,19 @@ function normalizeETag(etag) {
 }
 
 const server = createServer(async (req, res) => {
-  const stat = statSync(dataFile, { throwIfNoEntry: false });
-  if (!stat) {
-    res.writeHead(503, { 'Content-Type': 'text/plain' });
-    res.end('Maybe try again later');
-    return;
-  }
-
   if (normalizeETag(req.headers['if-none-match']) === cache.etag) {
     res.writeHead(304, {
       'ETag': cache.etag,
       'Cache-Control': 'public, max-age=3600'
     });
     res.end();
+    return;
+  }
+
+  const stat = statSync(dataFile, { throwIfNoEntry: false });
+  if (!stat) {
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Maybe try again later');
     return;
   }
 
