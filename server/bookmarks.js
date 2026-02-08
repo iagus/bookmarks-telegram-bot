@@ -105,7 +105,11 @@ const server = createServer(async (req, res) => {
       createReadStream(htmlPath).pipe(res);
 
     } catch (err) {
+      rl.close();
+      readStream.destroy();
       html.destroy();
+      fs.unlink(tmpHtmlPath);
+
       throw err;
     }
   } else {
