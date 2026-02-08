@@ -26,9 +26,10 @@ async function writeLine(writer, line) {
 };
 
 function updateCache(stat) {
+  cache.mtime = stat.mtime;
   cache.mtimeMs = stat.mtimeMs;
   cache.size = stat.size;
-  cache.etag = `"${stat.mtimeMs}"`
+  cache.etag = `"${stat.mtimeMs}"`;
 }
 
 // To compare ETags, discard weak ETag flag, compare in strong format.
@@ -103,6 +104,7 @@ const server = createServer(async (req, res) => {
 
       // Save current build information for later checks.
       updateCache({
+        mtime: stat.mtime,
         mtimeMs: stat.mtimeMs,
         size: htmlStat.size,
         etag: `"${stat.mtimeMs}"`
