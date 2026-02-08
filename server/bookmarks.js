@@ -73,8 +73,9 @@ const server = createServer(async (req, res) => {
       await writeLine(html, '<!DOCTYPE html><body>');
 
       for await (const line of rl) {
-        const bm = JSON.parse(line)
-        const rendered = `<div><a href="${bm.Link}">${bm?.data?.title}</a></div>`;
+        const bm = JSON.parse(line);
+        const title = bm?.data?.title || bm.Link;
+        const rendered = `<div><a href="${bm.Link}">${title}</a></div>`;
 
         await writeLine(html, rendered);
       }
