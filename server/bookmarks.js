@@ -13,7 +13,7 @@ import {
 const port = 3001;
 const htmlPath = 'index.html';
 const dataFile = process.env.BOOKMARKS_PATH;
-const cache = { mtimeMs: null, size: 0, etag: '' }
+const cache = { mtime: null, mtimeMs: null, size: 0, etag: '' }
 
 async function writeLine(writer, line) {
   if (!writer.write(line)) {
@@ -36,6 +36,11 @@ function updateCache(stat) {
 function normalizeETag(etag) {
   if (!etag) return "";
 
+  // if this is true, we are normalizing from mtimeMs
+  if (typeof etag !== "string") {
+    etag = `"${etag}"`;
+  }
+
   return etag.startsWith("W/") ? etag.replace(/^W\//, '') : etag;
 }
 
@@ -48,7 +53,11 @@ const server = createServer(async (req, res) => {
   }
 
   // We are using the data file's mtimeMs as the ETag header value.
-  if (normalizeETag(req.headers['if-none-match']) === stat.mtimeMs) {
+  // To return 304, we need to normalize the format of the request
+  // header value and the data source file's stat mtimeMs value.
+  const normalized_header = normalizeETag(req.headers['if-none-match']);
+  const normalized_mtimeMs = normalizeETag(stat.mtimeMs);
+  if (normalized_header === normalized_mtimeMs) {
     res.writeHead(304, {
       'ETag': cache.etag,
       'Cache-Control': 'public, max-age=3600'
