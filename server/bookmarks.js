@@ -38,7 +38,15 @@ function normalizeETag(etag) {
 }
 
 const server = createServer(async (req, res) => {
-  if (normalizeETag(req.headers['if-none-match']) === cache.etag) {
+  const stat = statSync(dataFile, { throwIfNoEntry: false });
+  if (!stat) {
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Maybe try again later');
+    return;
+  }
+
+  // We are using the data file's mtimeMs as the ETag header value.
+  if (normalizeETag(req.headers['if-none-match']) === stat.mtimeMs) {
     res.writeHead(304, {
       'ETag': cache.etag,
       'Cache-Control': 'public, max-age=3600'
@@ -47,17 +55,13 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  const stat = statSync(dataFile, { throwIfNoEntry: false });
-  if (!stat) {
-    res.writeHead(503, { 'Content-Type': 'text/plain' });
-    res.end('Maybe try again later');
-    return;
-  }
-
-  // We are using the data file's mtimeMs as a sort of identifier.
-  // So it will also function as an ETag header. Here we are comparing
-  // the current file state's mtimeMs with the cached mtimeMs from 
-  // the previous html build's data file mtimeMs.
+  // We are using the data file's mtimeMs as identifier.
+  // So it will also function as an ETag header. Here we are comparing the
+  // current data source file state's mtimeMs with the cached mtimeMs from 
+  // the previous html build's data source file.
+  // If those values are the same, we already have a fresh rendered html that
+  // we proceed to send to the client.
+  // Otherwise, the html is stale and must be re-rendered, then sent to client.
   if (stat.mtimeMs !== cache.mtimeMs) {
     // render data into temporary html to prevent serving partial rewrites
     // we will replace the old version with it once it's done
@@ -92,7 +96,7 @@ const server = createServer(async (req, res) => {
         'Content-Type': 'text/html; charset=utf-8',
         'Content-Length': htmlStat.size,
         'ETag': `"${stat.mtimeMs}"`, // keeping reference to data file
-        'Last-Modified': htmlStat.mtime.toUTCString(),
+        'Last-Modified': htmlStat.mtimeMs.toUTCString(),
         'Cache-Control': 'public, max-age=3600'
       });
 
@@ -119,7 +123,7 @@ const server = createServer(async (req, res) => {
       'Content-Type': 'text/html; charset=utf-8',
       'Content-Length': cache.size,
       'ETag': cache.etag,
-      'Last-Modified': cache.mtime.toUTCString(),
+      'Last-Modified': cache.mtimeMs.toUTCString(),
       'Cache-Control': 'public, max-age=3600'
     });
 
