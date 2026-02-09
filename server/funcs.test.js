@@ -44,6 +44,7 @@ test('updates external cache object', () => {
   assert.strictEqual(cache.mtime, statMock.mtime, 'Must save mtime');
   assert.strictEqual(cache.mtimeMs, statMock.mtimeMs, 'Must save mtimeMs');
   assert.strictEqual(cache.size, statMock.size, 'Must save size');
+  assert.strictEqual(cache.etag, `"${statMock.mtimeMs}"`, 'Must save size');
 });
 
 test('normalizes ETag across weak and strong format', () => {
