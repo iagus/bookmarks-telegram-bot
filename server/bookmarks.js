@@ -8,6 +8,11 @@ import {
   renameSync,
   unlink
 } from 'fs';
+import {
+  updateCache,
+  normalizeETag,
+  renderBookmark
+} from './funcs.js';
 
 const port = 3001;
 const htmlPath = 'index.html';
@@ -23,25 +28,6 @@ async function writeLine(writer, line) {
     console.log(`${stamp} Buffer drained`);
   }
 };
-
-function updateCache(stat) {
-  cache.mtime = stat.mtime;
-  cache.mtimeMs = stat.mtimeMs;
-  cache.size = stat.size;
-  cache.etag = `"${stat.mtimeMs}"`;
-}
-
-// To compare ETags, discard weak ETag flag, compare in strong format.
-function normalizeETag(etag) {
-  if (!etag) return "";
-
-  // if this is true, we are normalizing from mtimeMs
-  if (typeof etag !== "string") {
-    etag = `"${etag}"`;
-  }
-
-  return etag.startsWith("W/") ? etag.replace(/^W\//, '') : etag;
-}
 
 const server = createServer(async (req, res) => {
   const stat = statSync(dataFile, { throwIfNoEntry: false });
@@ -88,8 +74,7 @@ const server = createServer(async (req, res) => {
 
       for await (const line of rl) {
         const bm = JSON.parse(line);
-        const title = bm?.data?.title || bm.Link;
-        const rendered = `<div><a href="${bm.Link}">${title}</a></div>`;
+        const rendered = renderBookmark(bm);
 
         await writeLine(html, rendered);
       }
@@ -111,7 +96,7 @@ const server = createServer(async (req, res) => {
       });
 
       // Save current build information for later checks.
-      updateCache({
+      updateCache(cache, {
         mtime: stat.mtime,
         mtimeMs: stat.mtimeMs,
         size: htmlStat.size,
