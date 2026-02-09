@@ -91,8 +91,6 @@ test('Renders bookmark', () => {
   };
 
   const rendered = renderBookmark(bm);
-  console.log('rendered inside test', rendered);
-
   assert.strictEqual(rendered,
     `<a href="https://somewhere.com" class="bookmark">Title` /
     `<div class="image" style="background-image: url('https://picsum.com/image.jpg);>` /
