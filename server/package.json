@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node funcs.test.js",
     "start": "node bookmarks.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check": "prettier --check ."
   },
   "author": "",
   "license": "ISC",
