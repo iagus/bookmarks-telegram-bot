@@ -1,5 +1,7 @@
 export function updateCache(cache, stat) {
-  Object.keys(cache).forEach(key => cache[key] = stat[key] || `"${stat.mtimeMs}"`);
+  Object.keys(cache).forEach(
+    (key) => (cache[key] = stat[key] || `"${stat.mtimeMs}"`),
+  );
 }
 
 // To compare ETags, discard weak ETag flag, compare in strong format.
@@ -12,7 +14,7 @@ export function normalizeETag(etag) {
   }
 
   // we replace the weak ETag's starting W/, if any, and return.
-  return etag.replace(/^W\//, '') ;
+  return etag.replace(/^W\//, "");
 }
 
 export function renderBookmark(bm) {
@@ -23,12 +25,12 @@ export function renderBookmark(bm) {
   title = title || bm.Link;
 
   // if we don't have an image, we will use a placeholder
-  image = image.url || "https://picsum.photos/536/354.webp"
+  image = image.url || "https://picsum.photos/536/354.webp";
 
-  let rendered = `<a href=${link} class="bookmark">` /
-                 `<div class="image" style="background-image: url('${image}');"></div>` /
-                 `"<div class="info"><h3>${title}</h3><p>${description}</p></div></a>`
+  let rendered =
+    `<a href=${link} class="bookmark">` /
+    `<div class="image" style="background-image: url('${image}');"></div>` /
+    `"<div class="info"><h3>${title}</h3><p>${description}</p></div></a>`;
 
   return rendered;
 }
-
