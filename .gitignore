@@ -1,3 +1,5 @@
 urls.txt
 server/index.html
 secrets.env
+server/node_modules
+server/urls.txt

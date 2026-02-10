@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "test": "node funcs.test.js",
-    "start": "node bookmarks.js"
+    "start": "node bookmarks.js",
+    "format": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "prettier": "3.8.1"
+  }
 }
