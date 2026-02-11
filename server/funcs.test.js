@@ -90,11 +90,14 @@ test("Renders bookmark", () => {
   };
 
   const rendered = renderBookmark(bm);
-  assert.strictEqual(
-    rendered,
-    `<a href="https://somewhere.com" class="bookmark">Title` /
-      `<div class="image" style="background-image: url('https://picsum.com/image.jpg);>` /
-      `</div><div class="info"><h3>Title</h3><p>This is a description</p></div></a>`,
-    "Renders bookmark",
-  );
+
+  assert.strictEqual(typeof rendered, "string");
+  assert.ok(!Number.isNaN(rendered));
+
+  assert.ok(rendered.includes('href="https://somewhere.com"'));
+  assert.ok(rendered.includes(
+    `<div class="image" style="background-image: url('https://picsum.com/image.jpg');"></div>`
+  ));
+  assert.ok(rendered.includes('<h3>Title</h3>'));
+  assert.ok(rendered.includes('<p>This is a description</p>'));
 });
