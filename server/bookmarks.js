@@ -71,7 +71,22 @@ const server = createServer(async (req, res) => {
     });
 
     try {
-      await writeLine(html, "<!DOCTYPE html><body>");
+      await writeLine(
+        html,
+        `
+        <!DOCTYPE html>
+          <head>
+            <link href="styles.css" rel="stylesheet"></link>
+          </head>
+          <body>
+            <header class="header">
+              <div class="wrapper">
+                <h1 class="title">Bookmarks<h1>
+              </div>
+            </header>
+            <div class="wrapper main">
+      `,
+      );
 
       for await (const line of rl) {
         const bm = JSON.parse(line);
