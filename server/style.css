@@ -1,0 +1,191 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+*:not(dialog) {
+  margin: 0;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+a {
+  text-decoration: none;
+}
+
+.header {
+  height: 220px;
+  background: #020024;
+  background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(9, 11, 121, 1) 49%, rgba(187, 0, 255, 1) 95%);
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  padding-top: 150px;
+  padding-left: 16px;
+  color: #FFF;
+  font-size: 4rem;
+}
+
+.main {
+  background: #FFF;
+  padding: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.bookmark {
+  display: flex;
+  flex-direction: column;
+  background: #FFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.link {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  height: 100px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.info {
+  display: block;
+  padding: 1rem;
+}
+
+ /* I do not approve of styling html tags directly, this is an exception. */
+.info > h3 {
+  display: block;
+  margin-bottom: 15px;
+}
+
+@media (340px >= width) {
+  .title {
+    font-size: 3rem;
+  }
+}
+
+@media (width >= 375px) {
+  .header {
+    height: auto;
+  }
+
+  .wrapper {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .main {
+    display: grid;
+    gap: 1rem;
+    border-radius: 10px;
+    margin: 0 auto 0;
+  }
+
+  .bookmark {
+    flex-direction: row;
+    margin-bottom: 0;
+  }
+
+  .image,
+  .info {
+    width: 50%;
+  }
+
+  .image {
+    width: 50%;
+    height: auto;
+  }
+}
+
+@media (width >= 700px) {
+  .header {
+    height: 290px;
+  }
+
+  .title {
+    padding-left: 12px;
+    font-size: 8rem;
+  }
+
+  .main {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bookmark {
+    transition: transform 0.3s ease;
+  }
+
+  .bookmark:hover {
+    transform: scale(1.07);
+    z-index: 1;
+  }
+}
+
+@media (width >= 1050px) {
+  .header {
+    height: 510px;
+  }
+
+  .wrapper {
+    padding: 25px;
+    margin: 0 auto;
+  }
+
+  .main {
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 16px;
+    margin-top: -200px;
+  }
+}
+
+@media (width >= 1200px) {
+  .header {
+    height: 490px;
+    padding-left: 26px;
+  }
+
+  .wrapper {
+    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .wrapper.main {
+    padding: 25px;
+  }
+}
+
+
