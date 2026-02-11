@@ -3,7 +3,7 @@
 NPM_TESTS="Tests"
 FORMATTER="Format"
 
-# START
+# # START
 
 # Updating repository
 cd /opt/bookmarks-telegram-bot
@@ -24,10 +24,10 @@ cd server
 
 npm install
 
-if npm run test; then
+if npm run --silent test; then
   echo "${NPM_TESTS}: OK"
 
-  if npm run check; then
+  if npm run --silent check; then
     echo "${FORMATTER}: OK"
 
     cd ..
