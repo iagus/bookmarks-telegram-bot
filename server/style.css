@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -10,12 +12,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   overflow-wrap: break-word;
 }
 
@@ -23,7 +35,12 @@ p {
   text-wrap: pretty;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-wrap: balance;
 }
 
@@ -34,7 +51,12 @@ a {
 .header {
   height: 220px;
   background: #020024;
-  background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(9, 11, 121, 1) 49%, rgba(187, 0, 255, 1) 95%);
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 11, 121, 1) 49%,
+    rgba(187, 0, 255, 1) 95%
+  );
 }
 
 .wrapper {
@@ -45,12 +67,12 @@ a {
 .title {
   padding-top: 150px;
   padding-left: 16px;
-  color: #FFF;
+  color: #fff;
   font-size: 4rem;
 }
 
 .main {
-  background: #FFF;
+  background: #fff;
   padding: 1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
@@ -58,8 +80,8 @@ a {
 .bookmark {
   display: flex;
   flex-direction: column;
-  background: #FFF;
-  border: 1px solid #E5E5E5;
+  background: #fff;
+  border: 1px solid #e5e5e5;
   border-radius: 5px;
   margin-bottom: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -85,7 +107,7 @@ a {
   padding: 1rem;
 }
 
- /* I do not approve of styling html tags directly, this is an exception. */
+/* I do not approve of styling html tags directly, this is an exception. */
 .info > h3 {
   display: block;
   margin-bottom: 15px;
@@ -187,5 +209,3 @@ a {
     padding: 25px;
   }
 }
-
-
