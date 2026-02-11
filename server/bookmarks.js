@@ -76,7 +76,7 @@ const server = createServer(async (req, res) => {
         `
         <!DOCTYPE html>
           <head>
-            <link href="styles.css" rel="stylesheet"></link>
+            <link href="style.css" rel="stylesheet"></link>
           </head>
           <body>
             <header class="header">
