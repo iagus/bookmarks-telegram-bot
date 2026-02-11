@@ -95,9 +95,11 @@ test("Renders bookmark", () => {
   assert.ok(!Number.isNaN(rendered));
 
   assert.ok(rendered.includes('href="https://somewhere.com"'));
-  assert.ok(rendered.includes(
-    `<div class="image" style="background-image: url('https://picsum.com/image.jpg');"></div>`
-  ));
-  assert.ok(rendered.includes('<h3>Title</h3>'));
-  assert.ok(rendered.includes('<p>This is a description</p>'));
+  assert.ok(
+    rendered.includes(
+      `<div class="image" style="background-image: url('https://picsum.com/image.jpg');"></div>`,
+    ),
+  );
+  assert.ok(rendered.includes("<h3>Title</h3>"));
+  assert.ok(rendered.includes("<p>This is a description</p>"));
 });
