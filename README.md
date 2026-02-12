@@ -30,11 +30,9 @@ in my VPS server. You do you! If you want to go down the same path as me:
 
 ##### Requirements
 
-```
 - A Telegram bot token (get one from @BotFather)
 - An environment file with your secrets (example included)
 - Go toolchain (if building from source)
-```
 
 ##### Clone the repo
 
