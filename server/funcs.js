@@ -27,7 +27,7 @@ export function renderBookmark(bm) {
   // if we don't have an image, we will use a placeholder
   image = image?.url || "https://picsum.photos/536/354.webp";
 
-  let rendered = `<a href="${link}" class="bookmark">${title}
+  let rendered = `<a href="${link}" class="bookmark">
     <div class="image" style="background-image: url('${image}');"></div>
     <div class="info"><h3>${title}</h3><p>${description}</p></div></a>`;
 
