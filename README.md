@@ -8,12 +8,6 @@ I built this to solve a particular issue of mine— I am good at accumulating in
 keeping it tidy and organized. This is me trying to manage all the scattered links I have within
 a single place.
 
-##### Wishlist
-
-- [ ] Restart the systemd services if npm tasks are successfull (I forgot oops)
-- [ ] Fetch OpenGraph information thyself! I don't want to be rate limited by an external service!
-- [ ] Better placeholder if the OpenGraph image for the link can't be fetched or whatever other reason
-
 #### What does it do?
 
 This bot listens for your messages in Telegram and saves the URLs in them in a text file you
@@ -22,6 +16,12 @@ must specify. It comes with a server that will process the text file, build an H
 The cron is running frequently in my server. Checks for updates in the GitHub repository, and if
 there are any, it runs the test, pass the linter (Prettier would be the only dependency, and
 arguably could be just managed in the development phase but meh I was having a blast doing this part).
+
+##### Wishlist
+
+- [ ] Restart the systemd services if npm tasks are successfull (I forgot oops)
+- [ ] Fetch OpenGraph information thyself! I don't want to be rate limited by an external service!
+- [ ] Better placeholder if the OpenGraph image for the link can't be fetched or whatever other reason
 
 #### Installation
 
