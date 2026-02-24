@@ -1,12 +1,11 @@
 ### Bookmarks Telegram bot
 
-A Telegram bot for saving bookmarks— great for personal self-hosting on a home server or VPS.
+Small Telegram bot for saving bookmarks, designed for personal self-hosting on a home server or VPS.
 
-Minimal hassle. Keeps track of interesting links without dealing with specific browser bookmarks.
+A simple way to keep track of interesting links without relying on browser bookmarks.
 
-I built this to solve a particular issue of mine— I am good at accumulating information but bad at
-keeping it tidy and organized. This is me trying to manage all the scattered links I have within
-a single place.
+I built this to solve a personal problem — I accumulate a lot of information but struggle to keep it organized.
+This is an attempt to gather scattered links into one place.
 
 #### What does it do?
 
