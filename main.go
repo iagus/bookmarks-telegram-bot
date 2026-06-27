@@ -6,6 +6,9 @@ import (
 	"os"
 	"net/http"
 	"encoding/json"
+	"encoding/xml"
+	"bufio"
+	s "strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -24,6 +27,11 @@ type Metadata struct {
 			URL string `json:"url"`
 		} `json:"image"`
 	} `json:"data"`
+}
+
+type Tag struct {
+	Property string `xml:"property,attr"`
+	Content string `xml:"content,attr"`
 }
 
 func main() {
@@ -54,29 +62,58 @@ func main() {
 			bot.Send(msg)
 
 			link = update.Message.Text
-			metadata := processLink(link)
+			metadata, _ := processLink(link)
 			writeToFile(metadata)
 		}
 	}
 }
 
-func processLink(link string) (Metadata) {
-	resp, err := http.Get(service + "?url=" + link)
+func processLink(link string) (Metadata, error) {
+	res, err := http.Get(link)
 
 	var metadata Metadata
 
-	if err != nil {
-		log.Printf("[go] Error fetching metadata for provided link: %s", link)
-	} else  {
-		defer resp.Body.Close()
+	metadata.Link = link
 
-		if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
-			log.Printf("[go] Error decoding metadata for link: %s", link)
+	if err != nil {
+		log.Printf("[go] Error fetching link %s", link)
+	} else {
+		defer res.Body.Close()
+
+		log.Printf("[go] Response status for link %s %d", link, res.StatusCode)
+
+		b := bufio.NewReader(res.Body)
+		total := 0
+		for {
+			html, err := b.ReadString('>')
+			if (total == 3 || err != nil) {
+				break
+			} else {
+				var tag Tag
+				if s.Contains(html, "og:title") || s.Contains(html, "og:image\"") || s.Contains(html, "og:description") {
+					html = s.Replace(html, ">", "/>", 1)
+					err = xml.Unmarshal([]byte(html), &tag)
+
+					if (err != nil) {
+						break
+					}
+
+					switch tag.Property {
+					case "og:title":
+						metadata.Data.Title = tag.Content
+					case "og:image":
+						metadata.Data.Image.URL = tag.Content
+					case "og:description":
+						metadata.Data.Description = tag.Content
+					}
+
+					total = total + 1
+				}
+			}
 		}
 	}
 
-	metadata.Link = link
-	return metadata
+	return metadata, err
 }
 
 func writeToFile(data Metadata) {
