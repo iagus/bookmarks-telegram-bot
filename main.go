@@ -34,15 +34,19 @@ func main() {
 			log.Printf("[telegram] %s -- %s", update.Message.From.UserName, update.Message.Text)
 
 			log.Print("[go] ACK back to chat")
-
-			chat_res := fmt.Sprintf("Saving the following bookmark:\n %s", update.Message.Text)
+			chat_res := fmt.Sprintf("[go] Saving the following bookmark:\n %s", update.Message.Text)
 			msg := telegram.NewMessage(update.Message.Chat.ID, chat_res)
 			bot.Send(msg)
 
 			link = update.Message.Text
-			metadata, _ := handleLink(link)
-			metadata.Link = link
-			writeToFile(metadata)
+			metadata, error := handleLink(link)
+			if error != nil {
+				err_msg := telegram.NewMessage(update.Message.Chat.ID, "[go] Error handling bookmark")
+				bot.Send(err_msg)
+			} else {
+				metadata.Link = link
+				writeToFile(metadata)
+			}
 		}
 	}
 }
