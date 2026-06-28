@@ -22,6 +22,8 @@ arguably could be just managed in the development phase but meh I was having a b
 - [X] Fetch OpenGraph information thyself! I don't want to be rate limited by an external service!
 - [X] Better placeholder if the OpenGraph image for the link can't be fetched or whatever other reason
 - [ ] Check Node versions warnings in Github Actions
+- [ ] Deploy: Replace compiling go binary with a tmp binary and them replacing the old with the latest
+- [ ] SIGTERM sign support?
 
 #### Installation
 
