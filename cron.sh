@@ -34,7 +34,7 @@ if npm run --silent test; then
 
     printf "\n"
     printf "[telegram-bookmarks-bot] Compiling Go script"
-    /usr/local/go/bin/go build main.go
+    /usr/local/go/bin/go build main.go processor.go writer.go
     sudo systemctl restart bookmarks-telegram-go
 
     printf "\n\n"
