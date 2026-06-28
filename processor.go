@@ -4,59 +4,87 @@ import(
 	"log"
 	"net/http"
 	"encoding/xml"
-	"bufio"
+  "bufio"
 	s "strings"
 )
+
+const	Title = "og:title"
+const	Img = "og:image"
+const	Desc = "og:description"
 
 type Tag struct {
 	Property string `xml:"property,attr"`
 	Content string `xml:"content,attr"`
 }
 
-func processLink(link string) (Metadata, error) {
-	res, err := http.Get(link)
+func handleLink(link string) (Metadata, error) {
+	var m Metadata
+	tags, error := fetchMetadata(link)
+	if error != nil {
+		log.Printf("[go:handleLink:1] Error handling link")
+	} else {
+		m, error = process(tags)
+		if error != nil {
+			log.Printf("[go:handleLink:2] Error processing link")
+		}
+	}
 
-	var metadata Metadata
+	return m, error
+}
 
-	metadata.Link = link
-
-	if err != nil {
-		log.Printf("[go] Error fetching link %s", link)
+func fetchMetadata(link string) ([]string, error) {
+	res, error := http.Get(link)
+	var tags []string
+	if error != nil {
+		log.Printf("[go:fetchMetadata:1] Error fetching link %s", link)
 	} else {
 		defer res.Body.Close()
-
-		log.Printf("[go] Response status for link %s %d", link, res.StatusCode)
-
+		log.Printf("[go:fetchMetadata:2] Response status for link %s %d", link, res.StatusCode)
 		b := bufio.NewReader(res.Body)
-		total := 0
 		for {
-			html, err := b.ReadString('>')
-			if (total == 3 || err != nil) {
+			html, error := b.ReadString('>')
+			if (error != nil) {
 				break
 			} else {
-				var tag Tag
-				if s.Contains(html, "og:title") || s.Contains(html, "og:image\"") || s.Contains(html, "og:description") {
-					html = s.Replace(html, ">", "/>", 1)
-					err = xml.Unmarshal([]byte(html), &tag)
-
-					if (err != nil) {
-						break
-					}
-
-					switch tag.Property {
-					case "og:title":
-						metadata.Data.Title = tag.Content
-					case "og:image":
-						metadata.Data.Image.URL = tag.Content
-					case "og:description":
-						metadata.Data.Description = tag.Content
-					}
-
-					total = total + 1
+				if s.Contains(html, "/head") {
+					break
+				} else if s.Contains(html, Title) || s.Contains(html, Img) || s.Contains(html, Desc) {
+					html = s.Replace(html, ">", "/>", 1) // formatting for valid xml
+					tags = append(tags, html)
 				}
 			}
 		}
 	}
 
-	return metadata, err
+	return tags, error
 }
+
+func process(tags []string) (Metadata, error) {
+	var metadata Metadata
+	var tag Tag
+	var error error
+
+	for _, data := range tags {
+		error = xml.Unmarshal([]byte(data), &tag)
+		if error != nil {
+			log.Printf("[go:process:1] Error unmarshalling into Tag")
+			break
+		}
+
+		switch tag.Property {
+		case Title:
+			log.Printf("[go:process:2] Found Title meta tag: %s", tag.Content)
+			metadata.Data.Title = tag.Content
+		case Img:
+			log.Printf("[go:process:2] Found Image meta tag: %s", tag.Content)
+			metadata.Data.Image.URL = tag.Content
+		case Desc:
+			log.Printf("[go:process:2] Found Description meta tag: %s", tag.Content)
+			metadata.Data.Description = tag.Content
+		}
+	}
+
+
+	return metadata, error
+}
+

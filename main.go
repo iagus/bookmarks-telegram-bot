@@ -40,7 +40,8 @@ func main() {
 			bot.Send(msg)
 
 			link = update.Message.Text
-			metadata, _ := processLink(link)
+			metadata, _ := handleLink(link)
+			metadata.Link = link
 			writeToFile(metadata)
 		}
 	}
