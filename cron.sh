@@ -16,7 +16,7 @@ if [ "$LOCAL_HASH" = "$REMOTE_HASH" ]; then
   printf "[telegram-bookmarks-bot] No updates detected."
   exit 0
 else
-  git reset --soft origin/main
+  git reset --hard origin/main
 fi
 
 # Cd'ing to Node server
@@ -35,6 +35,7 @@ if npm run --silent test; then
     printf "\n"
     printf "[telegram-bookmarks-bot] Compiling Go script"
     /usr/local/go/bin/go build main.go
+    sudo systemctl restart bookmarks-telegram-go
 
     printf "\n\n"
     echo "[telegram-bookmarks-bot] All systems operational!"
