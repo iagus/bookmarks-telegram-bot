@@ -56,6 +56,8 @@ func fetchMetadata(link string) ([]string, error) {
 		}
 	}
 
+	log.Printf("[go:fetchMetadata:3] Found %d tags", len(tags))
+
 	return tags, error
 }
 
