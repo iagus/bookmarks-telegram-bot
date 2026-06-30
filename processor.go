@@ -50,23 +50,30 @@ func fetchMetadata(link string) ([]string, error) {
 	res, error := client.Do(req)
 	if error != nil {
 		log.Printf("[go:fetchMetadata:1] Error fetching link %s", link)
-	} else {
-		defer res.Body.Close()
-		log.Printf("[go:fetchMetadata:2] Response status for link %s %d", link, res.StatusCode)
-		b := bufio.NewReader(res.Body)
-		for {
-			html, error := b.ReadString('>')
-			if (error != nil) {
-				break
-			} else {
-				if s.Contains(html, "/head") {
-					break
-				} else if s.Contains(html, Title) || s.Contains(html, Img) || s.Contains(html, Desc) {
-					html = s.Replace(html, ">", "/>", 1) // formatting for valid xml
-					tags = append(tags, html)
-				}
-			}
+		return tags, error
+	}
+	defer res.Body.Close()
+
+	log.Printf("[go:fetchMetadata:2] Response status for link %s %d", link, res.StatusCode)
+
+	counter := 0
+	b := bufio.NewReader(res.Body)
+	for {
+		html, error := b.ReadString('>')
+		if error != nil {
+			log.Printf("[go:fetchMetadata:3] Error reading buffer on line %d", counter)
+			log.Printf("%v", error)
 		}
+
+		if s.Contains(html, "/head") {
+			break
+		}
+
+		if s.Contains(html, "<meta") {
+			tags = append(tags, html)
+		}
+
+		counter++
 	}
 
 	log.Printf("[go:fetchMetadata:3] Found %d tags", len(tags))
@@ -74,32 +81,43 @@ func fetchMetadata(link string) ([]string, error) {
 	return tags, error
 }
 
+
 func process(tags []string) (Metadata, error) {
 	var metadata Metadata
 	var tag Tag
 	var error error
 
 	for _, data := range tags {
+		data = normalize(data)
+
 		error = xml.Unmarshal([]byte(data), &tag)
 		if error != nil {
 			log.Printf("[go:process:1] Error unmarshalling into Tag")
+			log.Printf("%v", error)
 			break
 		}
 
-		switch tag.Property {
-		case Title:
+		if s.Contains(tag.Property, "title") {
 			log.Printf("[go:process:2] Found Title meta tag: %s", tag.Content)
 			metadata.Data.Title = tag.Content
-		case Img:
+		} else if s.Contains(tag.Property, "image") {
 			log.Printf("[go:process:2] Found Image meta tag: %s", tag.Content)
 			metadata.Data.Image.URL = tag.Content
-		case Desc:
+		} else if s.Contains(tag.Property, "description") {
 			log.Printf("[go:process:2] Found Description meta tag: %s", tag.Content)
 			metadata.Data.Description = tag.Content
+		} else {
+			log.Printf("[go:process:2] Meta tag %s not targeted. Dropped", tag.Content)
 		}
 	}
 
-
 	return metadata, error
+}
+
+func normalize(data string) string {
+	data = s.Replace(data, ">", "/>", 1)
+	data = s.Replace(data, "//>", "/>", 1)
+
+	return data
 }
 
