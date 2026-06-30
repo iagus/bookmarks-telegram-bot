@@ -8,10 +8,6 @@ import(
 	s "strings"
 )
 
-const	Title = "og:title"
-const	Img = "og:image"
-const	Desc = "og:description"
-
 type Tag struct {
 	Property string `xml:"property,attr"`
 	Content string `xml:"content,attr"`
