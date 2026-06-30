@@ -33,8 +33,21 @@ func handleLink(link string) (Metadata, error) {
 }
 
 func fetchMetadata(link string) ([]string, error) {
-	res, error := http.Get(link)
 	var tags []string
+
+	client := http.Client{}
+	req, error := http.NewRequest("GET", link, nil)
+	if error != nil {
+		log.Printf("Error creating request")
+		return tags, error
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:153.0) Gecko/20100101 Firefox/153.0")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+	req.Header.Set("Cache-Control", "no-cache")
+
+	res, error := client.Do(req)
 	if error != nil {
 		log.Printf("[go:fetchMetadata:1] Error fetching link %s", link)
 	} else {
