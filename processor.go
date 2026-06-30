@@ -94,13 +94,10 @@ func process(tags []string) (Metadata, error) {
 		}
 
 		if s.Contains(tag.Property, "title") {
-			log.Printf("[go:process:2] Found Title meta tag: %s", tag.Content)
 			metadata.Data.Title = tag.Content
 		} else if s.Contains(tag.Property, "image") {
-			log.Printf("[go:process:2] Found Image meta tag: %s", tag.Content)
 			metadata.Data.Image.URL = tag.Content
 		} else if s.Contains(tag.Property, "description") {
-			log.Printf("[go:process:2] Found Description meta tag: %s", tag.Content)
 			metadata.Data.Description = tag.Content
 		} else {
 			log.Printf("[go:process:2] Meta tag %s not targeted. Dropped", tag.Content)
