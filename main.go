@@ -44,7 +44,6 @@ func main() {
 				err_msg := telegram.NewMessage(update.Message.Chat.ID, "[go] Error handling bookmark")
 				bot.Send(err_msg)
 			} else {
-				metadata.Link = link
 				writeToFile(metadata)
 			}
 		}

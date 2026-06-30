@@ -3,29 +3,44 @@ package main
 import(
 	"log"
 	"net/http"
-	"encoding/xml"
+	x "encoding/xml"
+	j "encoding/json"
   "bufio"
 	s "strings"
 )
+
+type Metadata struct {
+	Link string
+	Data struct {
+		Title string `json:"title"`
+		Description string `json:"description"`
+		Image struct {
+			URL string `json:"url"`
+		} `json:"image"`
+	} `json:"data"`
+}
 
 type Tag struct {
 	Property string `xml:"property,attr"`
 	Content string `xml:"content,attr"`
 }
 
-func handleLink(link string) (Metadata, error) {
+func handleLink(link string) (string, error) {
 	var m Metadata
+	var l string
 	tags, error := fetchMetadata(link)
+
 	if error != nil {
 		log.Printf("[go:handleLink:1] Error handling link")
 	} else {
-		m, error = process(tags)
+		m, error = process(link, tags)
+		l, error = serialize(m)
 		if error != nil {
 			log.Printf("[go:handleLink:2] Error processing link")
 		}
 	}
 
-	return m, error
+	return l, error
 }
 
 func fetchMetadata(link string) ([]string, error) {
@@ -59,40 +74,34 @@ func fetchMetadata(link string) ([]string, error) {
 		if error != nil {
 			log.Printf("[go:fetchMetadata:3] Error reading buffer on line %d", counter)
 			log.Printf("%v", error)
-		}
-
-		if s.Contains(html, "/head") {
 			break
 		}
-
+		counter++
 		if s.Contains(html, "<meta") {
 			tags = append(tags, html)
+		} else if s.Contains(html, "/head") {
+			break
 		}
-
-		counter++
 	}
 
 	log.Printf("[go:fetchMetadata:3] Found %d tags", len(tags))
-
 	return tags, error
 }
 
 
-func process(tags []string) (Metadata, error) {
+func process(link string, tags []string) (Metadata, error) {
 	var metadata Metadata
 	var tag Tag
 	var error error
 
 	for _, data := range tags {
 		data = normalize(data)
-
-		error = xml.Unmarshal([]byte(data), &tag)
+		error = x.Unmarshal([]byte(data), &tag)
 		if error != nil {
 			log.Printf("[go:process:1] Error unmarshalling into Tag")
 			log.Printf("%v", error)
 			break
 		}
-
 		if s.Contains(tag.Property, "title") {
 			metadata.Data.Title = tag.Content
 		} else if s.Contains(tag.Property, "image") {
@@ -104,6 +113,7 @@ func process(tags []string) (Metadata, error) {
 		}
 	}
 
+	metadata.Link = link
 	return metadata, error
 }
 
@@ -112,5 +122,15 @@ func normalize(data string) string {
 	data = s.Replace(data, "//>", "/>", 1)
 
 	return data
+}
+
+func serialize(metadata Metadata) (string, error) {
+	data, error := j.Marshal(metadata)
+	if error != nil {
+		log.Printf("Error marshalling metadata into JSON")
+	}
+	var l string = string(data)
+
+	return l, error
 }
 

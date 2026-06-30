@@ -12,12 +12,16 @@ func TestProcess(t *testing.T) {
 		"<meta property=\"og:description\" content=\"OG Description\"/>",
 	}
 
-	metadata, _ := process(tags)
+	metadata, _ := process("https://example.com", tags)
 
+	wanted_link := regexp.MustCompile(`https://example.com`)
 	wanted_title := regexp.MustCompile(`OG Title`)
 	wanted_img := regexp.MustCompile(`OG Image`)
 	wanted_desc := regexp.MustCompile(`OG Description`)
 
+	if !wanted_link.MatchString(metadata.Link) {
+		t.Errorf("Link mismatch")
+	}
 	if !wanted_title.MatchString(metadata.Data.Title) {
 		t.Errorf("Title mismatch")
 	}
