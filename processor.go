@@ -99,8 +99,9 @@ func process(link string, tags []string) (Metadata, error) {
 		error = x.Unmarshal([]byte(data), &tag)
 		if error != nil {
 			log.Printf("[go:process:1] Error unmarshalling into Tag")
+			log.Printf("[go:process:1] Offender: %s", data)
 			log.Printf("%v", error)
-			break
+			continue
 		}
 		if s.Contains(tag.Property, "title") {
 			metadata.Data.Title = tag.Content
