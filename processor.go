@@ -127,7 +127,7 @@ func normalize(data string) string {
 func serialize(metadata Metadata) (string, error) {
 	data, error := j.Marshal(metadata)
 	if error != nil {
-		log.Printf("Error marshalling metadata into JSON")
+		log.Printf("[go:serialize:1] Error marshalling metadata into JSON")
 	}
 	var l string = string(data)
 
