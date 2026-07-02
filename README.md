@@ -20,8 +20,10 @@ arguably could be just managed in the development phase but meh I was having a b
 
 - [X] Restart the systemd services if npm tasks are successfull (I forgot oops)
 - [X] Fetch OpenGraph information thyself! I don't want to be rate limited by an external service!
-- [X] Better placeholder if the OpenGraph image for the link can't be fetched or whatever other reason
+- [ ] Better placeholder if the OpenGraph image for the link can't be fetched or whatever other reason
+- [ ] Lazy load of images
 - [ ] Check Node versions warnings in Github Actions
+- [ ] Use YouTube Data API to fetch video's OpenGraph metadata
 
 #### Installation
 
