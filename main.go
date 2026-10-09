@@ -10,7 +10,6 @@ import (
 var token string = os.Getenv("BOOKMARKS_TOKEN")
 var user string = os.Getenv("BOOKMARKS_USER")
 var path string = os.Getenv("BOOKMARKS_PATH")
-var service string = os.Getenv("BOOKMARS_SERVICE")
 
 func main() {
 	var link string
