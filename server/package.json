@@ -4,7 +4,7 @@
   "main": "bookmarks.js",
   "type": "module",
   "scripts": {
-    "test": "node --test funcs.test.js",
+    "test": "node --test helpers.test.js",
     "start": "node bookmarks.js",
     "format": "prettier --write .",
     "check": "prettier --check ."

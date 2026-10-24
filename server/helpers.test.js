@@ -1,6 +1,6 @@
 import test from "node:test";
 import { strict as assert } from "node:assert";
-import { updateCache, normalizeETag, renderBookmark } from "./funcs.js";
+import { updateCache, normalizeETag, renderBookmark } from "./helpers.js";
 
 // mocking a stat object
 const statMock = {

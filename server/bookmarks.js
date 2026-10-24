@@ -8,7 +8,7 @@ import {
   renameSync,
   unlink,
 } from "fs";
-import { updateCache, normalizeETag, renderBookmark } from "./funcs.js";
+import { updateCache, normalizeETag, renderBookmark } from "./helpers.js";
 
 const port = 3001;
 const htmlPath = "index.html";
